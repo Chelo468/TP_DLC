@@ -9,14 +9,7 @@ import dlc.indexador.entidades.Vocabulario;
 import java.util.Calendar;
 import java.util.Map;
 import dlc.indexador.bd.AccesoBD;
-import dlc.indexador.bd.DBPosteo;
-import dlc.indexador.bd.DBVocabulario;
 import dlc.indexador.entidades.Posteo;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -33,10 +26,11 @@ public class Main {
           AccesoBD db = new AccesoBD();
           db.obtenerConexion();
           db.getStatement();
-          AccesoBD.borrarDatos(db);
-          AccesoBD.crearDatos(db);
-          //Indexador.Indexar();
-          IndexadorDrive.Indexar();
+          
+        //  AccesoBD.borrarDatos(db);
+         // AccesoBD.crearDatos(db);
+          Indexador.Indexar();
+          //IndexadorDrive.Indexar();
           //Map<String, Vocabulario> resultado = IndexadorDrive.Indexar(); 
           
             

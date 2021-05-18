@@ -16,16 +16,10 @@ import dlc.indexador.entidades.Posteo;
 import dlc.indexador.entidades.Vocabulario;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.DirectoryIteratorException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,6 +106,7 @@ public class Indexador {
          }
           System.out.println(posteosIndexados.size());
           int posteosEnBD = DBPosteo.contarPosteos(db);
+          System.out.println(posteosEnBD);
           if (posteosEnBD == 0){
              InsertarPosteosBDInicial(db);
          }

@@ -9,7 +9,6 @@ import dlc.indexador.drive.GoogleDriveUtils;
 import com.google.api.services.drive.Drive;
 import static dlc.indexador.drive.ReadFromDrive.obtenerArchivos;
 import static dlc.indexador.drive.ReadFromDrive.descargarArchivo;
-import static dlc.indexador.Indexador.generarAccesoBD;
 import dlc.indexador.bd.AccesoBD;
 import dlc.indexador.bd.DBDocumento;
 import dlc.indexador.bd.DBPosteo;
@@ -20,11 +19,8 @@ import dlc.indexador.entidades.Documento;
 import dlc.indexador.entidades.Posteo;
 import dlc.indexador.entidades.Vocabulario;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -62,9 +58,9 @@ public class IndexadorDrive {
         return posteosIndexados;
     }
     
-    public static void Indexar() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
+    public static void Indexar(String idDrive) throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
     {
-       String idDrive = "0B_R7SeoAotsmUUtYendIX04zRjA";
+      // String idDrive = "0B_R7SeoAotsmUUtYendIX04zRjA";
 
        AccesoBD db = generarAccesoBD();
        obtenerVocabularios(db);       
@@ -78,7 +74,7 @@ public class IndexadorDrive {
             posteosIndexados = new HashMap<String, Posteo>();
         }
         if (Configuracion.DIRECTORIO_ORIGEN != null) {
-            
+            try{
             Map<String, String> archivosDrive = obtenerDrive(idDrive, driveService);
             Documento doc;
             DBDocumento.prepararDocumento(db);
@@ -90,7 +86,7 @@ public class IndexadorDrive {
                 if(doc == null){
                 String pathArchivo = Configuracion.DIRECTORIO_ORIGEN + nombreFichero;
                 descargarArchivo(pathArchivo, link,driveService);
-                doc = new Documento(nombreFichero, pathArchivo);
+                doc = new Documento(nombreFichero, link);
                 int cantidadPalabras = indexarNuevoDocumento(pathArchivo);
                 doc.setCantidadPalabras(cantidadPalabras);
                 if(i % 50 == 0)
@@ -101,6 +97,11 @@ public class IndexadorDrive {
                      i++; 
                   }            
             }
+            }
+            catch (Exception ex){
+                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
         }
          System.out.println(palabrasIndexadas.size());
          int vocabulariosEnBD = DBVocabulario.contarVocabularios(db);

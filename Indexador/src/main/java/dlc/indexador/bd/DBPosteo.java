@@ -149,7 +149,7 @@ public static void prepararPosteo(AccesoBD db) throws Exception{
      String palabra = posteo.getIdPalabra();
      String documento = posteo.getIdDocumento();
      int cantidadRepeticiones = posteo.getCantidadRepeticiones();
-        String sql = "UPDATE POSTEO cantidadRepeticiones=? "
+        String sql = "UPDATE POSTEO SET cantidadRepeticiones=? "
                 + "WHERE palabra=? and documento=?";
         db.prepareStatement(sql);
         db.setInt(1, cantidadRepeticiones);
