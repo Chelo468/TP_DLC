@@ -14,10 +14,53 @@ import java.util.Map;
  * @author Chelo
  */
 public class Vocabulario {
-    private int idPalabra;
     private String palabra;
     private int cantidadDocumentos;
     private int maximaFrecuencia;
+    private boolean actualizado;
+
+    public Vocabulario() {
+        this.palabra = null;
+        this.cantidadDocumentos = 0;
+        this.maximaFrecuencia = 0;
+        this.actualizado = false;
+        repeticionesEnDocumentos = new HashMap<String, Integer>();
+    }
+
+    public void setActualizado() {
+        this.actualizado = true;
+    }
+    public void setPalabra(String palabra) {
+        this.palabra = palabra;
+    }
+
+    public void setCantidadDocumentos(int cantidadDocumentos) {
+        this.cantidadDocumentos = cantidadDocumentos;
+    }
+
+    public void setMaximaFrecuencia(int maximaFrecuencia) {
+        this.maximaFrecuencia = maximaFrecuencia;
+    }
+
+    public void setRepeticionesEnDocumentos(Map<String, Integer> repeticionesEnDocumentos) {
+        this.repeticionesEnDocumentos = repeticionesEnDocumentos;
+    }
+
+    public String getPalabra() {
+        return palabra;
+    }
+
+    public int getCantidadDocumentos() {
+        return cantidadDocumentos;
+    }
+
+    public int getMaximaFrecuencia() {
+        return maximaFrecuencia;
+    }
+
+    public Map<String, Integer> getRepeticionesEnDocumentos() {
+        return repeticionesEnDocumentos;
+    }
     
     private Map<String, Integer> repeticionesEnDocumentos;
     
@@ -26,9 +69,10 @@ public class Vocabulario {
         this.palabra = palabra;
         this.cantidadDocumentos = 0;
         this.maximaFrecuencia = 0;
+        this.actualizado = false;
         repeticionesEnDocumentos = new HashMap<String, Integer>();
     }
-    
+   
     public void agregarCantidadEnDocumento(String documento)
     {
         Integer cantidad = repeticionesEnDocumentos.get(documento);
@@ -41,13 +85,16 @@ public class Vocabulario {
             if(cantidad > maximaFrecuencia)
             {
                 maximaFrecuencia = cantidad;
+                this.actualizado = false;
             }
         }
         else
         {
             cantidadDocumentos++;
             cantidad = 1;
-            maximaFrecuencia = 1;
+            if(maximaFrecuencia == 0){
+                maximaFrecuencia = 1;
+            }
         }
         
         repeticionesEnDocumentos.put(documento, cantidad);
@@ -58,6 +105,10 @@ public class Vocabulario {
         
         
         
+    }
+
+    public boolean getActualizado() {
+        return this.actualizado;
     }
     
 }
