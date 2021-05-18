@@ -5,7 +5,7 @@
  */
 package dlc.indexador.bd;
 
-import static dlc.indedxador.drive.ReadFromDrive.descargarArchivo;
+import static dlc.indexador.drive.ReadFromDrive.descargarArchivo;
 import dlc.indexador.configuracion.Configuracion;
 import dlc.indexador.entidades.Vocabulario;
 import java.sql.Statement;

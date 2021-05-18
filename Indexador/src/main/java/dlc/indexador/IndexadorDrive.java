@@ -5,10 +5,10 @@
  */
 package dlc.indexador;
 
-import dlc.indedxador.drive.GoogleDriveUtils;
+import dlc.indexador.drive.GoogleDriveUtils;
 import com.google.api.services.drive.Drive;
-import static dlc.indedxador.drive.ReadFromDrive.obtenerArchivos;
-import static dlc.indedxador.drive.ReadFromDrive.descargarArchivo;
+import static dlc.indexador.drive.ReadFromDrive.obtenerArchivos;
+import static dlc.indexador.drive.ReadFromDrive.descargarArchivo;
 import static dlc.indexador.Indexador.generarAccesoBD;
 import dlc.indexador.bd.AccesoBD;
 import dlc.indexador.bd.DBDocumento;
@@ -86,9 +86,8 @@ public class IndexadorDrive {
             for (Map.Entry<String, String> entry : archivosDrive.entrySet()) {
                 String link = entry.getValue();
                 String nombreFichero = entry.getKey();
-                doc = DBDocumento.loadDB(db, link, false);
+                doc = DBDocumento.loadDB(db, link);
                 if(doc == null){
-                System.out.println(entry.getValue());
                 String pathArchivo = Configuracion.DIRECTORIO_ORIGEN + nombreFichero;
                 descargarArchivo(pathArchivo, link,driveService);
                 doc = new Documento(nombreFichero, pathArchivo);

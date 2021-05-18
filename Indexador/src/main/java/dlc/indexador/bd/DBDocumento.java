@@ -72,14 +72,7 @@ public abstract class DBDocumento {
         rs.close();
         return documento;
     }
-    public static Documento loadDB(AccesoBD db, String link, boolean bool) throws Exception {
-        String query = "SELECT * FROM DOCUMENTO d WHERE d.url = '" + link + "'";
-       // db.prepareStatement(query);
-        ResultSet rs = db.executeQuery(query);
-        Documento documento = buildDocumento(rs);
-        rs.close();
-        return documento;
-    }
+    
     public static ArrayList<Documento> loadDB(AccesoBD db, String[] palabras) throws Exception {
         ArrayList<Documento> documentos = new ArrayList<>();
         String busqueda = "";
@@ -123,7 +116,7 @@ public abstract class DBDocumento {
         db.executeUpdate();
         }
     public static void prepararDocumento(AccesoBD db) throws SQLException{
-        String sql = "INSERT INTO DOCUMENTO VALUES(?,?,?,?)";
+        String sql = "INSERT INTO DOCUMENTO VALUES(?,?,?)";
         db.prepareStatement(sql);
     }
     public static void agregarDocumentoPreparado(AccesoBD db, Documento doc) throws SQLException, Exception{
