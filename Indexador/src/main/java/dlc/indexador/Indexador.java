@@ -98,15 +98,17 @@ public class Indexador {
         }
          System.out.println(palabrasIndexadas.size());
          int vocabulariosEnBD = DBVocabulario.contarVocabularios(db);
-         if (vocabulariosEnBD == 0){
-             InsertarPalabrasBDInicial(db);
+         if (posteosIndexados.size() != 0){
+            if (vocabulariosEnBD == 0){
+                InsertarPalabrasBDInicial(db);
+            }
+            else{
+                ActualizarPalabrasBD(db);
+            }
          }
-         else{
-             ActualizarPalabrasBD(db);
-         }
+         
           System.out.println(posteosIndexados.size());
           int posteosEnBD = DBPosteo.contarPosteos(db);
-          System.out.println(posteosEnBD);
           if (posteosEnBD == 0){
              InsertarPosteosBDInicial(db);
          }
@@ -183,7 +185,7 @@ public class Indexador {
                 
                 palabrasIndexadas.put(word, palabra);
                 
-                String key = word + nombreDocumento;
+                String key = nombreDocumento + word;
                 Posteo posteo = posteosIndexados.get(key);
                 if (posteo == null) {
 
@@ -228,7 +230,8 @@ public class Indexador {
 
     private static void ActualizarPalabrasBD(AccesoBD db) {
        palabrasIndexadas.forEach((key, value) -> {
-            Vocabulario voc;    
+            if (value.getActualizado() == false){
+                Vocabulario voc;
                 try {
                     voc = DBVocabulario.loadDB(db, value.getPalabra());
                     if (voc == null){
@@ -236,15 +239,12 @@ public class Indexador {
                         DBVocabulario.agregarVocabularioPreparado(db, value);
                     }    
                     else{
-                        if (value.getActualizado() == false){
                             DBVocabulario.actualizarVocabulario(db, value);
-                            System.out.println("actualizado");
                         }
-                       
-                    }
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
+              }
             });
     }
 
@@ -270,7 +270,6 @@ public class Indexador {
                     }
                     else{
                         DBPosteo.actualizarPosteo(db, value);
-                            System.out.println("actualizado");
                     }
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

@@ -27,17 +27,16 @@ public class Main {
           db.obtenerConexion();
           db.getStatement();
           
-        //  AccesoBD.borrarDatos(db);
-         // AccesoBD.crearDatos(db);
+         // AccesoBD.borrarDatos(db);
+          //AccesoBD.crearDatos(db);
+         // Indexador.Indexar();
           Indexador.Indexar();
-          //IndexadorDrive.Indexar();
           //Map<String, Vocabulario> resultado = IndexadorDrive.Indexar(); 
           
             
          //   System.out.println(resultado);
                         
-            Map<String, Vocabulario> palabrasIndexadas = Indexador.getPalabrasIndexadas();
-            System.out.println(palabrasIndexadas.size());
+          
            //DBVocabulario.prepararVocabularioMerge(db);
          //   DBVocabulario.prepararVocabulario(db);
 //            palabrasIndexadas.forEach((key, value) -> {
@@ -75,8 +74,6 @@ public class Main {
 //                System.out.println(test.getPalabra());
 //                System.out.println(test.getCantidadDocumentos());
 //                System.out.println(test.getMaximaFrecuencia());
-            Map<String, Posteo> posteosIndexados = Indexador.getPosteosIndexadas();
-            System.out.println(posteosIndexados.size());
 //            DBPosteo.prepararPosteo(db);
 //            posteosIndexados.forEach((key, value) -> {
 //                try {
@@ -100,7 +97,6 @@ public class Main {
             long milisFinal = Calendar.getInstance().getTimeInMillis();
             long demoraProceso = milisFinal - milisInicial;
             
-            System.out.println("Cantidad de palabras indexadas: " + palabrasIndexadas.size());
             System.out.println("Tiempo de proceso: " + (demoraProceso / 1000) + " segundos.");
         }
         catch(Exception ex)

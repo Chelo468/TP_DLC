@@ -85,7 +85,7 @@ public class Vocabulario {
             if(cantidad > maximaFrecuencia)
             {
                 maximaFrecuencia = cantidad;
-                this.actualizado = false;
+                
             }
         }
         else
@@ -98,7 +98,7 @@ public class Vocabulario {
         }
         
         repeticionesEnDocumentos.put(documento, cantidad);
-        
+        this.actualizado = false;
     }
     
     public void indexarDocumento(String documento) {
