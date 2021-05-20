@@ -58,13 +58,13 @@ public interface DBVocabulario {
          ArrayList<Vocabulario> vocabularios = new ArrayList<>();
          ResultSet rs = db.executeQuery(query);
          Vocabulario vocabulario;
-        int i = 0;
+        //int i = 0;
         do{
           vocabulario = buildVocabulario(rs);
           if (vocabulario != null){
                vocabularios.add(vocabulario);
           }
-          i++;
+          //i++;
         }
         while(vocabulario != null);
         rs.close();

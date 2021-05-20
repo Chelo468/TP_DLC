@@ -24,7 +24,7 @@ public class AccesoBD {
     public static final String SQLDRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String CONNECTIONURL = "jdbc:sqlserver://localhost;databaseName=DLCDB";
     public static final String USER = "sa";
-    public static final String PASSWORD = "admin";
+    public static final String PASSWORD = "123456";
     Connection cn = null;
     Statement stmt = null;
     PreparedStatement pstmt = null;
@@ -33,7 +33,12 @@ public class AccesoBD {
             return this.cn;
         }
     public Statement getStatement() throws SQLException{
-        this.stmt = this.cn.createStatement();
+        
+            if(this.cn != null)
+            {
+                this.stmt = this.cn.createStatement();                
+            }
+        
             return this.stmt;
         }
     public static void crearDatos(AccesoBD db) throws ClassNotFoundException, SQLException{

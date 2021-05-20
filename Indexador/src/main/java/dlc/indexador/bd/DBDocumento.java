@@ -64,8 +64,8 @@ public abstract class DBDocumento {
         }
         return cantidadDocumentos;
     }
-    public static Documento loadDB(AccesoBD db, String palabra) throws Exception {
-        String query = "SELECT * FROM DOCUMENTO d WHERE d.titulo = '" + palabra + "'";
+    public static Documento loadDB(AccesoBD db, String tituloDocumento) throws Exception {
+        String query = "SELECT * FROM DOCUMENTO d WHERE d.titulo = '" + tituloDocumento + "'";
        // db.prepareStatement(query);
         ResultSet rs = db.executeQuery(query);
         Documento documento = buildDocumento(rs);

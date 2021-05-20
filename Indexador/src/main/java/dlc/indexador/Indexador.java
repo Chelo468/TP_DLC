@@ -54,49 +54,54 @@ public class Indexador {
     }
     
     
-    public static void Indexar() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
+    public static void Indexar(AccesoBD db) throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
     {
-        AccesoBD db = generarAccesoBD();
-        obtenerVocabularios(db);        
-        if(palabrasIndexadas == null)
-        {
-            palabrasIndexadas = new HashMap<String, Vocabulario>();
-        }
+        //AccesoBD db = generarAccesoBD();
+        
+        //Obtenemos el vocabulario cargado en base
+        obtenerVocabularios(db);       
+        
         if(posteosIndexados == null)
         {
             posteosIndexados = new HashMap<String, Posteo>();
         }
+        
         if (Configuracion.DIRECTORIO_ORIGEN != null) {            
             //Agregado
             Documento doc;
             File dir = new File(Configuracion.DIRECTORIO_ORIGEN);
+            
             String[] ficheros = dir.list();
             String nombreFichero;
             String pathArchivo;
+            
             DBDocumento.prepararDocumento(db);
+            
             for (int i = 0; i < ficheros.length; i++) {
+                
                 nombreFichero = ficheros[i];
+                
                 doc = DBDocumento.loadDB(db, nombreFichero);
+                
                 if(doc == null){
                      pathArchivo = Configuracion.DIRECTORIO_ORIGEN + nombreFichero;
-                  doc = new Documento(nombreFichero, pathArchivo);
-                  int cantidadPalabras = indexarNuevoDocumento(pathArchivo);
-                doc.setCantidadPalabras(cantidadPalabras);
-                if(i % 50 == 0)
-                {
-                    System.out.println("Documentos procesados: " + i);    
-                }
-                   DBDocumento.agregarDocumentoPreparado(db, doc);
+                    doc = new Documento(nombreFichero, pathArchivo);
+                    int cantidadPalabras = indexarNuevoDocumento(pathArchivo);
+                    
+                    doc.setCantidadPalabras(cantidadPalabras);
+                    
+                    if(i % 50 == 0)
+                    {
+                        System.out.println("Documentos procesados: " + i);    
+                    }
+                    
+                    DBDocumento.agregarDocumentoPreparado(db, doc);
                     
                 }
-//                else{
-//                  String titulo = doc.getTitulo();
-//                    System.out.println(titulo);
-//                }
                 
             }
         }
-         System.out.println(palabrasIndexadas.size());
+         System.out.println("Palabras Indexadas: " + palabrasIndexadas.size());
          int vocabulariosEnBD = DBVocabulario.contarVocabularios(db);
          if (vocabulariosEnBD == 0){
              InsertarPalabrasBDInicial(db);
@@ -104,9 +109,9 @@ public class Indexador {
          else{
              ActualizarPalabrasBD(db);
          }
-          System.out.println(posteosIndexados.size());
+          System.out.println("Posteos indexados: " + posteosIndexados.size());
           int posteosEnBD = DBPosteo.contarPosteos(db);
-          System.out.println(posteosEnBD);
+          System.out.println("Posteos en base: " + posteosEnBD);
           if (posteosEnBD == 0){
              InsertarPosteosBDInicial(db);
          }
@@ -171,7 +176,9 @@ public class Indexador {
 
                 //Traemos la palabra del indexador
                 Vocabulario palabra = palabrasIndexadas.get(word);
+                
                 cantidadPalabras++;
+                
                 if (palabra == null) {
 
                     //No está agregada en el vocabulario que estamos indexando
@@ -189,9 +196,10 @@ public class Indexador {
 
                     posteo = new Posteo(word, nombreDocumento);
 
-            }
-                    posteo.sumarRepeticion();
-                    posteosIndexados.put(key, posteo);
+                }
+                
+                posteo.sumarRepeticion();
+                posteosIndexados.put(key, posteo);
         }
 
     }
@@ -200,11 +208,11 @@ public class Indexador {
 
     private static void obtenerVocabularios(AccesoBD db) throws Exception {
         ArrayList<Vocabulario> vocabularios = DBVocabulario.loadAllDB(db);
+        
+        palabrasIndexadas = new HashMap<String, Vocabulario>();
+        
         if (vocabularios != null){
-            if(palabrasIndexadas == null)
-        {
-            palabrasIndexadas = new HashMap<String, Vocabulario>();
-            }
+                        
             for (int i = 0; i < vocabularios.size(); i++) {
                 Vocabulario vocabulario = vocabularios.get(i);
                 String palabra = vocabulario.getPalabra();
@@ -238,7 +246,7 @@ public class Indexador {
                     else{
                         if (value.getActualizado() == false){
                             DBVocabulario.actualizarVocabulario(db, value);
-                            System.out.println("actualizado");
+                            //System.out.println("actualizado");
                         }
                        
                     }
