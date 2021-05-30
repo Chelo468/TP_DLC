@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class AccesoBD {
     public static final String SQLDRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String CONNECTIONURL = "jdbc:sqlserver://localhost;databaseName=DLCDB";
+    public static final String CONNECTIONURL = "jdbc:sqlserver://localhost;databaseName=DLCDB_Dev";
     public static final String USER = "sa";
     public static final String PASSWORD = "123456";
     Connection cn = null;

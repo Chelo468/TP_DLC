@@ -54,9 +54,9 @@ public class Indexador {
     }
     
     
-    public static void Indexar(AccesoBD db) throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
+    public static void Indexar() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
     {
-        //AccesoBD db = generarAccesoBD();
+        AccesoBD db = generarAccesoBD();
         
         //Obtenemos el vocabulario cargado en base
         obtenerVocabularios(db);       
@@ -156,7 +156,8 @@ public class Indexador {
 
         while ((inputLine = reader.readLine()) != null) {
             //Expresión regular para parsear la linea  
-            inputLine = inputLine.replaceAll("[^a-zA-ZÁÉÍÓÚáéíóúÑñÜü]", " ").toLowerCase();
+            //inputLine = inputLine.replaceAll("[^a-zA-ZÁÉÍÓÚáéíóúÑñÜü]", " ").toLowerCase();
+            inputLine = filtrarPalabras(inputLine);
             
             //Separamos todas las palabras de la linea
             String[] words = inputLine.split("\\s+");
@@ -170,7 +171,7 @@ public class Indexador {
             for (String word : words) {
 
                 //Ignoramos texto vacio despues del  parse
-                if (word.equals("")) {
+                if (esPalabraAIgnorar(word)) {
                     continue;
                 }
 
@@ -285,4 +286,22 @@ public class Indexador {
                 }
             });
     }
+    
+    private static boolean esPalabraAIgnorar(String word){
+        return word.equals("") || word.contains("@**@");
+    }
+    
+    private static String filtrarPalabras(String inputLine)
+    {        
+        //Expresión regular para parsear la linea  
+        inputLine = inputLine.replaceAll("[^a-zA-Z0-9ÁÉÍÓÚáéíóúÑñÜü'\\s]", "").toLowerCase();
+
+        //folio/35 => folio@**@35        
+        inputLine = inputLine.replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ü", "u").toLowerCase();
+        
+        inputLine = inputLine.replace("'", "");
+                
+
+        return inputLine;
+    }   
 }

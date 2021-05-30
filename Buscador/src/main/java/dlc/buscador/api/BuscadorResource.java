@@ -60,6 +60,7 @@ public class BuscadorResource {
     public Response buscar(@PathParam("texto") String texto) throws SQLException, Exception {
         //TODO return proper representation object
         ArrayList<Resultado> salida = Buscador.buscar(texto);
+        
         if (salida != null){
               return Response.ok(salida).build();
         }
