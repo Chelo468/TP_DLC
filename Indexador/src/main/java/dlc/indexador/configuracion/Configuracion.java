@@ -20,7 +20,8 @@ public class Configuracion {
     public static final String DIRECTORIO_DESTINO = "D:\\UTN\\04-Cuarto Año\\DLC\\00 - Old\\TP\\DocumentosTP1\\subidos\\todos\\";
    // public static final String DIRECTORIO_ORIGEN = "C:\\Users\\Gabriel\\Desktop\\Facultad\\2021\\DLC\\Todos los archivos para TP\\";
     //public static final String DIRECTORIO_ORIGEN = "C:\\Users\\Gabriel\\Desktop\\Facultad\\2021\\DLC\\Archivos para TP\\";
+
 //    public static final String DIRECTORIO_ORIGEN = "C:\\Users\\Gabriel\\Desktop\\Facultad\\2021\\DLC\\Archivos Drive\\";
 //    public static final String DIRECTORIO_DESTINO = "C:\\Users\\Gabriel\\Desktop\\Facultad\\2021\\DLC\\DocumentosTP1\\";
-    
+
 }

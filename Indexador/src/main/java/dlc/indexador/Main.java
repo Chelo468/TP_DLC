@@ -38,12 +38,12 @@ public class Main {
           
             Map<String, Posteo> posteosIndexados = Indexador.getPosteosIndexadas();
             System.out.println(posteosIndexados.size());
+
             
             
             long milisFinal = Calendar.getInstance().getTimeInMillis();
             long demoraProceso = milisFinal - milisInicial;
             
-            System.out.println("Cantidad de palabras indexadas: " + palabrasIndexadas.size());
             System.out.println("Tiempo de proceso: " + (demoraProceso / 1000) + " segundos.");
         }
         catch(Exception ex)

@@ -72,6 +72,14 @@ public abstract class DBDocumento {
         rs.close();
         return documento;
     }
+    public static Documento loadDB(String link, AccesoBD db) throws Exception {
+        String query = "SELECT * FROM DOCUMENTO d WHERE d.url = '" + link + "'";
+       // db.prepareStatement(query);
+        ResultSet rs = db.executeQuery(query);
+        Documento documento = buildDocumento(rs);
+        rs.close();
+        return documento;
+    }
     
     public static ArrayList<Documento> loadDB(AccesoBD db, String[] palabras) throws Exception {
         ArrayList<Documento> documentos = new ArrayList<>();
