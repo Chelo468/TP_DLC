@@ -6,6 +6,7 @@
 package dlc.buscador.api;
 
 import dlc.buscador.busqueda.Buscador;
+import dlc.buscador.entidades.Resultado;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -17,9 +18,10 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.MediaType;
 import dlc.indexador.Indexador;
 import dlc.indexador.IndexadorDrive;
-import dlc.indexador.entidades.Resultado;
+import dlc.indexador.bd.AccesoBD;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -30,12 +32,14 @@ import org.json.JSONObject;
  *
  * @author Gabriel
  */
-@Path("/buscador")
+@Path("buscador")
 @RequestScoped
 public class BuscadorResource {
-
+    
     @Context
     private UriInfo context;
+    
+    //@Inject private AccesoBD db;
 
     /**
      * Creates a new instance of BuscadorResource
@@ -54,17 +58,28 @@ public class BuscadorResource {
         return Response.status(Response.Status.BAD_REQUEST).build();
       
     }
+    
     @GET
     @Path("/{texto}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response buscar(@PathParam("texto") String texto) throws SQLException, Exception {
         //TODO return proper representation object
-        ArrayList<Resultado> salida = Buscador.buscar(texto);
         
-        if (salida != null){
-              return Response.ok(salida).build();
+        try
+        {
+            ArrayList<Resultado> salida = Buscador.buscar(texto);
+
+            if (salida != null){
+                  return Response.ok(salida).build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        catch(Exception ex)
+        {
+            //return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.accepted(ex.toString()).build();
+        }
+        
       
     }
 

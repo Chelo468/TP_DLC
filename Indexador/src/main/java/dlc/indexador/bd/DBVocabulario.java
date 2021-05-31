@@ -164,17 +164,35 @@ public static void prepararVocabularioMerge(AccesoBD db) throws SQLException {
         db.setInt(5, maximaFrecuencia);
         db.executeUpdate();
         }
+     
+     public static void prepararActualizarVocabulario(AccesoBD db) throws SQLException
+     {
+         String sql = "UPDATE VOCABULARIO SET cantidadDocumentos=?, maximaFrecuencia=? "
+                + "WHERE palabra=?";
+         
+        db.prepareStatement(sql);
+     }
 
     public static void actualizarVocabulario(AccesoBD db, Vocabulario vocabulario) throws SQLException, Exception{
     String palabra = vocabulario.getPalabra();
         Integer cantidadDocumentos = vocabulario.getCantidadDocumentos();
         Integer maximaFrecuencia = vocabulario.getMaximaFrecuencia();
-        String sql = "UPDATE VOCABULARIO SET cantidadDocumentos=?, maximaFrecuencia=? "
-                + "WHERE palabra=?";
-        db.prepareStatement(sql);
+        
         db.setString(3, palabra);
         db.setInt(1, cantidadDocumentos);
         db.setInt(2, maximaFrecuencia);
         db.executeUpdate();
         }
+    
+    public static void actualizarCantidadDeDocumentos(AccesoBD db) throws Exception
+    {
+        String sqlQuery = "update VOCABULARIO\n" +
+                        "set VOCABULARIO.cantidadDocumentos = (SELECT COUNT(pos.idVocabulario)\n" +
+                        "FROM Posteo pos\n" +
+                        "where VOCABULARIO.palabra = pos.idVocabulario)\n" +
+                        "from Posteo pos2\n" +
+                        "where VOCABULARIO.palabra = pos2.idVocabulario";
+        
+        db.executeQuery(sqlQuery);
+    }
 }

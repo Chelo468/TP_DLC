@@ -35,7 +35,9 @@ public class Indexador {
     
     private static int cantidadDocumentosIndexados;
     private static Map<String, Vocabulario> palabrasIndexadas;
-    private static Map<String, Posteo> posteosIndexados;
+    private static Map<String, Posteo> posteosIndexados;    
+    private static AccesoBD db;
+    private static long CANTIDAD_POSTEOS_MEMORIA = 200000;
     
     public static AccesoBD generarAccesoBD() throws ClassNotFoundException, SQLException{
         AccesoBD db = new AccesoBD();
@@ -56,7 +58,8 @@ public class Indexador {
     
     public static void Indexar() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
     {
-        AccesoBD db = generarAccesoBD();
+        System.out.println("Comienzo de indexado...");
+        db = generarAccesoBD();
         
         //Obtenemos el vocabulario cargado en base
         obtenerVocabularios(db);       
@@ -65,6 +68,11 @@ public class Indexador {
         {
             posteosIndexados = new HashMap<String, Posteo>();
         }
+        
+        Map<String, Posteo> posteosAInsertar = new HashMap<>();
+        
+        int contadorDocumentos = 0;
+        long contPosteos = 0;
         
         if (Configuracion.DIRECTORIO_ORIGEN != null) {            
             //Agregado
@@ -77,6 +85,9 @@ public class Indexador {
             
             DBDocumento.prepararDocumento(db);
             
+            
+            System.out.println("Documentos encontrados: " + ficheros.length);
+                        
             for (int i = 0; i < ficheros.length; i++) {
                 
                 nombreFichero = ficheros[i];
@@ -84,67 +95,109 @@ public class Indexador {
                 doc = DBDocumento.loadDB(db, nombreFichero);
                 
                 if(doc == null){
-                     pathArchivo = Configuracion.DIRECTORIO_ORIGEN + nombreFichero;
+                    
+                    contadorDocumentos++;
+                    
+                    pathArchivo = Configuracion.DIRECTORIO_ORIGEN + nombreFichero;
                     doc = new Documento(nombreFichero, pathArchivo);
-                    int cantidadPalabras = indexarNuevoDocumento(pathArchivo);
+                    Map<String, Posteo> posteosDocumento = indexarNuevoDocumento(pathArchivo);
                     
-                    doc.setCantidadPalabras(cantidadPalabras);
-                    
-                    if(i % 50 == 0)
+                    if(posteosDocumento != null)
                     {
-                        System.out.println("Documentos procesados: " + i);    
+                        doc.setCantidadPalabras(posteosDocumento.size());
+                                        
+                        if(contadorDocumentos == 1 || i == 0 || (i + 1) % 10 == 0)
+                        {
+                            System.out.println("Documentos procesados: " + (i + 1));    
+                        }
+
+                        DBDocumento.agregarDocumento(db, doc);
+
+                        posteosAInsertar.putAll(posteosDocumento);
+                        
+                        if(posteosAInsertar.size() > CANTIDAD_POSTEOS_MEMORIA)
+                        {
+                            contPosteos += posteosAInsertar.size();
+                            
+                            System.out.println("Cargando " + posteosAInsertar.size() + " posteos para llegar a " + contPosteos);
+                            
+                            insertarPosteos(posteosAInsertar);
+                            
+                            System.out.println("Posteos insertados exitosamente...");
+                            
+                            posteosAInsertar.clear();
+                            
+                        }
                     }
                     
-                    DBDocumento.agregarDocumentoPreparado(db, doc);
                     
                 }
                 
             }
-        }
-         System.out.println("Palabras Indexadas: " + palabrasIndexadas.size());
-         int vocabulariosEnBD = DBVocabulario.contarVocabularios(db);
-         if (posteosIndexados.size() != 0){
-            if (vocabulariosEnBD == 0){
-                InsertarPalabrasBDInicial(db);
-            }
-            else{
+            
+            if(contadorDocumentos > 0)
+            {
+                System.out.println("Actualizando cantidades de documentos en vocabulario...");
                 ActualizarPalabrasBD(db);
+                
+                System.out.println("Vocabulario actualizado...");
             }
-         }
-          System.out.println("Posteos indexados: " + posteosIndexados.size());
-          int posteosEnBD = DBPosteo.contarPosteos(db);
-          System.out.println("Posteos en base: " + posteosEnBD);
-
-          if (posteosEnBD == 0){
-             InsertarPosteosBDInicial(db);
-         }
-         else{
-             ActualizarPosteosBD(db);
-         }
+            
+            if(posteosAInsertar.size() > 0)
+            {
+                contPosteos += posteosAInsertar.size();
+                System.out.println("Cargando " + posteosAInsertar.size() + " posteos para llegar a " + contPosteos);
+                insertarPosteos(posteosAInsertar);
+                
+                System.out.println("Posteos insertados exitosamente...");
+                
+                posteosAInsertar.clear();
+            }
+            
+            System.out.println("Documentos indexados: " + contadorDocumentos);
+        }
+        
+         System.out.println("Palabras Indexadas: " + palabrasIndexadas.size());
+         
+//         int vocabulariosEnBD = DBVocabulario.contarVocabularios(db);
+//         if (posteosIndexados.size() != 0){
+//            if (vocabulariosEnBD == 0){
+//                InsertarPalabrasBDInicial(db);
+//            }
+//            else{
+//                ActualizarPalabrasBD(db);
+//            }
+//         }
+          System.out.println("Posteos indexados: " + contPosteos);
+//          int posteosEnBD = DBPosteo.contarPosteos(db);
+//          System.out.println("Posteos en base: " + posteosEnBD);
+//
+//          if (posteosEnBD == 0){
+//             InsertarPosteosBDInicial(db);
+//         }
+//         else{
+//             ActualizarPosteosBD(db);
+//         }
     }
     
-    private static int indexarNuevoDocumento(String name) throws IOException {
-        int cantidadPalabras = 0;
+    private static Map<String, Posteo> indexarNuevoDocumento(String name) throws IOException, SQLException, Exception {
+        //int cantidadPalabras = 0;
         if (name != null) {
             
             Path fileToIndex = Paths.get(name);
-            
-            //El siguiente método permite obtener la ruta completa del archivo
-            //String toString = fileToIndex.toString();
-            
-            //El siguiente método permite obtener el nombre del archivo sin la ruta
-            //String fileName = fileToIndex.getFileName().toString();
-            
-            
-
-            cantidadPalabras = indexarPalabras(fileToIndex);
+                      
+            return indexarPalabras(fileToIndex);
             
         }
-        return cantidadPalabras;
+        
+        return null;
     }
     
-    private static int indexarPalabras(Path archivoProcesar) throws IOException {
+    private static Map<String, Posteo> indexarPalabras(Path archivoProcesar) throws IOException, SQLException, Exception {
 
+        Map<String, Vocabulario> palabrasNuevas = new HashMap<>();
+        Map<String, Posteo> posteosNuevos = new HashMap<>();
+        
         AccesoFile File = new AccesoFile();
 
         BufferedReader reader = File.leerArchivo(archivoProcesar.toString());
@@ -156,6 +209,8 @@ public class Indexador {
 
         //inputLine es la linea ha ser leida 
         String inputLine = null;
+        
+        boolean agregarPalabraNueva = false;
 
         while ((inputLine = reader.readLine()) != null) {
             //Expresión regular para parsear la linea  
@@ -173,6 +228,8 @@ public class Indexador {
             //Recorremos palabra por palabra 
             for (String word : words) {
 
+                agregarPalabraNueva = false;
+                
                 //Ignoramos texto vacio despues del  parse
                 if (esPalabraAIgnorar(word)) {
                     continue;
@@ -187,6 +244,8 @@ public class Indexador {
 
                     //No está agregada en el vocabulario que estamos indexando
                     palabra = new Vocabulario(word);
+                    
+                    agregarPalabraNueva = true;
 
                 }
                
@@ -194,8 +253,13 @@ public class Indexador {
                 
                 palabrasIndexadas.put(word, palabra);
                 
+                if(agregarPalabraNueva)
+                {
+                    palabrasNuevas.put(word, palabra);
+                }
+                
                 String key = nombreDocumento + word;
-                Posteo posteo = posteosIndexados.get(key);
+                Posteo posteo = posteosNuevos.get(key);
                 if (posteo == null) {
 
                     posteo = new Posteo(word, nombreDocumento);
@@ -203,11 +267,29 @@ public class Indexador {
                 }
                 
                 posteo.sumarRepeticion();
-                posteosIndexados.put(key, posteo);
-        }
-
+                posteosNuevos.put(key, posteo);
+        }           
     }
-    return cantidadPalabras;
+        
+    //System.out.println("Palabras a agregar: " + palabrasNuevas.size() + " ; Archivo: " + archivoProcesar.getFileName().toString());
+    
+    boolean statementPreparado = false;
+    
+    for (Map.Entry<String, Vocabulario> entry : palabrasNuevas.entrySet()) {
+        
+        if(!statementPreparado)
+        {
+            DBVocabulario.prepararVocabulario(db);
+            
+            statementPreparado = true;
+        }
+        
+        DBVocabulario.agregarVocabularioPreparado(db, entry.getValue());
+        
+          
+    };//Fin foreach
+    
+    return posteosNuevos;
 }
 
     private static void obtenerVocabularios(AccesoBD db) throws Exception {
@@ -237,9 +319,39 @@ public class Indexador {
                 }
             });
     }
+    
+    private static void InsertarPalabrasBDInicial(AccesoBD db, Map<String, Vocabulario> palabras) throws SQLException {
+        DBVocabulario.prepararVocabulario(db);  
+        palabras.forEach((key, value) -> {   
+                try {
+                    DBVocabulario.agregarVocabularioPreparado(db, value);
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+    }
 
-    private static void ActualizarPalabrasBD(AccesoBD db) {
-       palabrasIndexadas.forEach((key, value) -> {
+    private static void ActualizarPalabrasBD(AccesoBD db) throws Exception {
+        
+        boolean statementPreparado = false;
+        
+        for (Map.Entry<String, Vocabulario> entry : palabrasIndexadas.entrySet()) {
+            
+            if (entry.getValue().getActualizado() == false){
+                    if(!statementPreparado)
+                    {
+                        DBVocabulario.prepararActualizarVocabulario(db);
+                        statementPreparado = true;
+                    }
+
+                    DBVocabulario.actualizarVocabulario(db, entry.getValue());
+
+              }
+            };
+    }
+    
+    private static void ActualizarPalabrasBD(AccesoBD db, Map<String, Vocabulario> palabras) {
+       palabras.forEach((key, value) -> {
             if (value.getActualizado() == false){
                 Vocabulario voc;
                 try {
@@ -305,4 +417,27 @@ public class Indexador {
 
         return inputLine;
     }   
+
+    private static void insertarPosteos(Map<String, Posteo> posteosAInsertar) throws Exception {
+        
+        boolean statementPreparado = false;
+    
+        for (Map.Entry<String, Posteo> entry : posteosAInsertar.entrySet()) {
+
+            if(!statementPreparado)
+            {
+                DBPosteo.prepararPosteo(db);
+
+                statementPreparado = true;
+            }
+
+            DBPosteo.agregarPosteoPreparado(db, entry.getValue());
+
+
+        };//Fin foreach
+        
+        
+        
+        
+    }
 }

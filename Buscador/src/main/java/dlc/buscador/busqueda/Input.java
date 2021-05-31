@@ -5,7 +5,6 @@
  */
 package dlc.buscador.busqueda;
 
-import dlc.indexador.entidades.Resultado;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;

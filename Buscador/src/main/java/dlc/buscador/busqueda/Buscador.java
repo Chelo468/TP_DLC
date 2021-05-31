@@ -5,13 +5,13 @@
  */
 package dlc.buscador.busqueda;
 
+import dlc.buscador.entidades.Resultado;
 import dlc.indexador.bd.AccesoBD;
 import dlc.indexador.bd.DBDocumento;
 import dlc.indexador.bd.DBPosteo;
 import dlc.indexador.bd.DBVocabulario;
 import dlc.indexador.entidades.Documento;
 import dlc.indexador.entidades.Posteo;
-import dlc.indexador.entidades.Resultado;
 import dlc.indexador.entidades.Vocabulario;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,55 +24,124 @@ import java.util.Map;
  */
 public class Buscador {
     private static Map<String, Float> pesosBusqueda;
+    private static Map<String, Integer> frecuencias;    
+    private static Map<String, Resultado> resultadosMap;
+    
     public static ArrayList<Resultado> buscar(String busqueda) throws ClassNotFoundException, SQLException, Exception {
-        pesosBusqueda = new HashMap<String, Float>();
+        
+        AccesoBD db = new AccesoBD();
+        
+        db.obtenerConexion();
+        db.getStatement();
+            
+        resultadosMap = new HashMap<String, Resultado>();
            
-         AccesoBD db = new AccesoBD();
-         db.obtenerConexion();
-         db.getStatement();
-         int documentos = DBDocumento.contarDocumentos(db);
-         System.out.println("La cantidad de documentos es: " + documentos);
+         
+         int cantidadDeDocumentosEnBase = DBDocumento.contarDocumentos(db);
+         
+         System.out.println("La cantidad de documentos es: " + cantidadDeDocumentosEnBase);
+         
+         busqueda = busqueda.replace("+", " ");
+         
+         //Separamos los terminos de busqueda por espacio
          String[] words = busqueda.split("\\s+");
+         
+         Resultado resultado = new Resultado();
+         
+         //Para cada resultado mostrar la palabra buscada y su peso asociado         
          for (int i = 0; i < words.length; i++) {
-            String word = words[i];
+             
+            String word = words[i];            
+            
             ArrayList<Posteo> posteos = DBPosteo.loadDB(db, word);
             Vocabulario vocabulario = DBVocabulario.loadDB(db, word);
-
-             int cantidadDocumentos = vocabulario.getCantidadDocumentos();
+            
              for (int j = 0; j < posteos.size(); j++) {
+                 
                  String nombre = posteos.get(j).getIdDocumento();
                  Documento doc = DBDocumento.loadDB(db,nombre);
-                 double cantidadPalabras = Math.sqrt(doc.getCantidadPalabras());
-                 //System.out.println(cantidadPalabras);
+                 
+                 resultado = resultadosMap.get(nombre);
+                 
+                 if(resultado == null)
+                 {
+                     resultado = new Resultado();
+                     
+                     resultado.setDocumento(doc);
+                     resultado.agregarPalabra(vocabulario.getPalabra(), 0f);
+                     
+                     resultadosMap.put(nombre, resultado);
+                 }
+                 else
+                 {
+                     resultado.agregarPalabra(vocabulario.getPalabra(), 0f);
+                     resultadosMap.put(nombre, resultado);
+                 }
+                 
+                 double frecuenciaInversa = Math.log(cantidadDeDocumentosEnBase/vocabulario.getCantidadDocumentos());
+                 
                  int frecuencia = posteos.get(j).getCantidadRepeticiones();
-                 double frecuenciaInversa = Math.log(documentos/cantidadDocumentos);
-                 Float peso =  ((float)frecuencia / (float) cantidadPalabras) * (float) frecuenciaInversa;
-                 Float valor = pesosBusqueda.get(nombre);
-                 if (valor != null){
-                     valor = valor + peso;
-               
-                 }
-                 else{
-                     valor = peso;
-                 }
-                       pesosBusqueda.put(nombre, valor);
+                 
+                 Float peso =  ((float)frecuencia / (float) Math.sqrt(doc.getCantidadPalabras())) * (float) frecuenciaInversa;
+                 
+                 resultado = resultadosMap.get(nombre);
+                                  
+                 resultado.setFrecuenciaPalabra(vocabulario.getPalabra(), frecuencia);
+                 resultado.sumarPesoAPalabra(vocabulario.getPalabra(), peso);
+                 resultado.sumarPeso(peso);
+                 
+                 resultadosMap.put(nombre, resultado);
+//                 if(resultado == null)
+//                 {
+//                     resultado = new Resultado();
+//                     resultado.setDocumento(doc);
+//                     resultado.setFrecuencia(frecuencia);
+//                     resultado.setPeso(peso);
+//                 }
+                 
+                 
+                                  
+                 
+                 //Float valor = pesosBusqueda.get(nombre);
+                 
+                 
+                 
+//                 Resultado resultado = resultados.get(nombre);
+//                 
+//                 if (resultado != null){
+//                     resultado.sumarPeso(peso);               
+//                 }
+//                 else{
+//                     resultado = resultadoNuevo;
+//                 }
+//                 
+//                 resultados.put(nombre, resultado);
+                 
+//                pesosBusqueda.put(nombre, valor);
+//                frecuencias.put(nombre, frecuencia);
              }
         }
-         Map<String, Float> pesosOrdenados = MapUtil.sortByValue(pesosBusqueda);
+         
+         resultadosMap = MapUtil.sortByValue(resultadosMap);
+         
          ArrayList<Resultado> listaResultados = new ArrayList<>();
+         
          int i = 0;
-         for (Map.Entry<String, Float> entry : pesosOrdenados.entrySet()) {
-             Documento doc = DBDocumento.loadDB(db, entry.getKey());
-             Float peso = entry.getValue();
-             Resultado resultado = new Resultado(doc, peso);
-             listaResultados.add(resultado);
-  //  System.out.println("clave=" + entry.getKey() + ", valor=" + entry.getValue());
-    i++;
-    if (i == 50){
-        break;
-    }
-} 
-         return listaResultados;
+         for (Map.Entry<String, Resultado> entry : resultadosMap.entrySet()) {
+            //Documento doc = DBDocumento.loadDB(db, entry.getKey());
+            //Float peso = entry.getValue();
+            //Resultado resultado = new Resultado(doc, peso);
+
+            //resultado.setFrecuencia(frecuencias.get(entry.getKey()));
+
+            listaResultados.add(entry.getValue());
+            i++;
+    //    if (i == 50){
+    //        break;
+    //    }
+        } 
+         
+        return listaResultados;
     }
     
 }
