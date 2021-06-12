@@ -41,6 +41,7 @@ public class IndexadorDrive {
     private static AccesoBD db;
     private static Map<String, Posteo> posteosIndexados;
     private static long CANTIDAD_POSTEOS_MEMORIA = 200000;
+    private static int contadorActualizaciones = 0;
     
     
     public static AccesoBD generarAccesoBD() throws ClassNotFoundException, SQLException{
@@ -283,11 +284,11 @@ public class IndexadorDrive {
     
     private static void obtenerVocabularios(AccesoBD db) throws Exception {
         ArrayList<Vocabulario> vocabularios = DBVocabulario.loadAllDB(db);
+        
+        palabrasIndexadas = new HashMap<String, Vocabulario>();
         if (vocabularios != null){
-            if(palabrasIndexadas == null)
-        {
-            palabrasIndexadas = new HashMap<String, Vocabulario>();
-            }
+         
+            
             for (int i = 0; i < vocabularios.size(); i++) {
                 Vocabulario vocabulario = vocabularios.get(i);
                 String palabra = vocabulario.getPalabra();
@@ -309,10 +310,32 @@ public class IndexadorDrive {
             });
     }
 
-    private static void ActualizarPalabrasBD(AccesoBD db) {
-       palabrasIndexadas.forEach((key, value) -> {
+   private static void ActualizarPalabrasBD(AccesoBD db) throws Exception {
+        
+        boolean statementPreparado = false;
+        
+        for (Map.Entry<String, Vocabulario> entry : palabrasIndexadas.entrySet()) {
             
-              if (value.getActualizado() == false){
+            if (entry.getValue().getActualizado() == false){
+                    if(!statementPreparado)
+                    {
+                        DBVocabulario.prepararActualizarVocabulario(db);
+                        statementPreparado = true;
+                    }
+                     
+                    DBVocabulario.actualizarVocabulario(db, entry.getValue());
+                    contadorActualizaciones++;
+                    if (contadorActualizaciones % 25000 == 0){
+                        System.out.println("Se han actualizado " + contadorActualizaciones + " vocabularios");
+                    }
+
+              }
+            };
+    }
+    
+    private static void ActualizarPalabrasBD(AccesoBD db, Map<String, Vocabulario> palabras) {
+       palabras.forEach((key, value) -> {
+            if (value.getActualizado() == false){
                 Vocabulario voc;
                 try {
                     voc = DBVocabulario.loadDB(db, value.getPalabra());
@@ -322,9 +345,8 @@ public class IndexadorDrive {
                     }    
                     else{
                             DBVocabulario.actualizarVocabulario(db, value);
-                            System.out.println("actualizado");
-                        }
 
+                        }
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
