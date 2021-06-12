@@ -23,15 +23,18 @@ public class Main {
         {
             long milisInicial = Calendar.getInstance().getTimeInMillis();
             
-            //AccesoBD db = new AccesoBD();
+            AccesoBD db = new AccesoBD();
 
             //Inicializa el conector
-            //db.obtenerConexion();
+            db.obtenerConexion();
 
             //Crea el objeto Statement en la conexion
             //db.getStatement();
 
-            Indexador.Indexar();
+          //  AccesoBD.borrarDatos(db);
+           // AccesoBD.crearDatos(db);
+            IndexadorDrive.Indexar("asd");
+      //      IndexadorDrive.Indexar("0B_R7SeoAotsmUUtYendIX04zRjA");
 
             Map<String, Vocabulario> palabrasIndexadas = Indexador.getPalabrasIndexadas();
             System.out.println(palabrasIndexadas.size());

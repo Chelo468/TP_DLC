@@ -38,6 +38,7 @@ public class Indexador {
     private static Map<String, Posteo> posteosIndexados;    
     private static AccesoBD db;
     private static long CANTIDAD_POSTEOS_MEMORIA = 200000;
+    private static int contadorActualizaciones = 0;
     
     public static AccesoBD generarAccesoBD() throws ClassNotFoundException, SQLException{
         AccesoBD db = new AccesoBD();
@@ -56,7 +57,7 @@ public class Indexador {
     }
     
     
-    public static void Indexar() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
+    public static boolean Indexar() throws FileNotFoundException, IOException, ClassNotFoundException, SQLException, Exception
     {
         System.out.println("Comienzo de indexado...");
         db = generarAccesoBD();
@@ -178,6 +179,7 @@ public class Indexador {
 //         else{
 //             ActualizarPosteosBD(db);
 //         }
+        return true;
     }
     
     private static Map<String, Posteo> indexarNuevoDocumento(String name) throws IOException, SQLException, Exception {
@@ -343,8 +345,12 @@ public class Indexador {
                         DBVocabulario.prepararActualizarVocabulario(db);
                         statementPreparado = true;
                     }
-
+                     
                     DBVocabulario.actualizarVocabulario(db, entry.getValue());
+                    contadorActualizaciones++;
+                    if (contadorActualizaciones % 25000 == 0){
+                        System.out.println("Se han actualizado " + contadorActualizaciones + " vocabularios");
+                    }
 
               }
             };

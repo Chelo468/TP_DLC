@@ -18,17 +18,22 @@ public class Vocabulario {
     private int cantidadDocumentos;
     private int maximaFrecuencia;
     private boolean actualizado;
+    private boolean subido;
 
     public Vocabulario() {
         this.palabra = null;
         this.cantidadDocumentos = 0;
         this.maximaFrecuencia = 0;
         this.actualizado = false;
+        this.subido = false;
         repeticionesEnDocumentos = new HashMap<String, Integer>();
     }
 
     public void setActualizado() {
         this.actualizado = true;
+    }
+    public void setSubido() {
+        this.subido = true;
     }
     public void setPalabra(String palabra) {
         this.palabra = palabra;
@@ -70,6 +75,7 @@ public class Vocabulario {
         this.cantidadDocumentos = 0;
         this.maximaFrecuencia = 0;
         this.actualizado = false;
+        this.subido = false;
         repeticionesEnDocumentos = new HashMap<String, Integer>();
     }
    
@@ -110,5 +116,7 @@ public class Vocabulario {
     public boolean getActualizado() {
         return this.actualizado;
     }
-    
+    public boolean getSubido() {
+        return this.subido;
+    }
 }

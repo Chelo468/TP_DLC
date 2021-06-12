@@ -22,9 +22,9 @@ import java.util.Map;
  */
 public class AccesoBD {
     public static final String SQLDRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String CONNECTIONURL = "jdbc:sqlserver://localhost;databaseName=DLCDB_Dev";
+    public static final String CONNECTIONURL = "jdbc:sqlserver://localhost;databaseName=DLCDB";
     public static final String USER = "sa";
-    public static final String PASSWORD = "123456";
+    public static final String PASSWORD = "admin";
     Connection cn = null;
     Statement stmt = null;
     PreparedStatement pstmt = null;
@@ -45,20 +45,22 @@ public class AccesoBD {
            Connection con = db.getConnection();
         Statement st = con.createStatement();
         String sql = "CREATE TABLE DOCUMENTO " +
-                   " (titulo VARCHAR(255)not NULL, " + 
-                   " url VARCHAR(255), " + 
+                   " (titulo VARCHAR(100)not NULL UNIQUE, " + 
+                   " url VARCHAR(100), " + 
                    " cantidadPalabras INTEGER, " + 
                    " PRIMARY KEY ( titulo ));" + 
                     "CREATE TABLE VOCABULARIO " +
-                   " (palabra VARCHAR(255) not NULL, " + 
+                   " (palabra VARCHAR(100) not NULL UNIQUE, " + 
                    " cantidadDocumentos INTEGER, " +  
                    " maximaFrecuencia INTEGER, " +  
                    "PRIMARY KEY ( palabra ));" +
                    "CREATE TABLE POSTEO " +
-                   "( idVocabulario VARCHAR(255) not NULL FOREIGN KEY REFERENCES VOCABULARIO (palabra), " + 
-                   " idDocumento VARCHAR(255) not NULL FOREIGN KEY REFERENCES DOCUMENTO (titulo), " +  
+               // "( idVocabulario VARCHAR(255) not NULL, " + 
+                   "( idVocabulario VARCHAR(100) not NULL FOREIGN KEY REFERENCES VOCABULARIO (palabra), " + 
+                   " idDocumento VARCHAR(100) not NULL FOREIGN KEY REFERENCES DOCUMENTO (titulo), " +  
                    " cantidadRepeticiones INTEGER, " +  
                    " PRIMARY KEY ( idVocabulario, idDocumento));";
+         //       "CREATE INDEX indice on VOCABULARIO(palabra);";
         //FOREIGN KEY REFERENCES VOCABULARIO (palabra)
         st.executeUpdate(sql);
         }
