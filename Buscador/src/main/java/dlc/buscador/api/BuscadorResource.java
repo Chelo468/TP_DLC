@@ -32,7 +32,7 @@ import org.json.JSONObject;
  *
  * @author Gabriel
  */
-@Path("buscador")
+@Path("/buscador")
 @RequestScoped
 public class BuscadorResource {
     
@@ -88,43 +88,71 @@ public class BuscadorResource {
      * @param content representation for the resource
      */
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
+  //  @Consumes(MediaType.APPLICATION_JSON)
     public Response putJson(String content) throws ClassNotFoundException, SQLException, Exception {
-        JSONObject obj;
-         obj = new JSONObject(content);
-         String link = (String) obj.get("link");
-         try{
-             if (link != null){
-             IndexadorDrive.Indexar(link);
+        try{
+                JSONObject obj;
+                obj = new JSONObject(content);
+                String metodo = (String) obj.get("metodo");
+                boolean resultado;
+                switch(metodo){
+                    case "local":
+                        resultado = Indexador.Indexar();
+                        if (resultado == true){
+                            return Response.ok("Indexado manual OK").build();
+                            }
+                        else{
+                            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                        }
+                    case "drive":
+                        String link = (String) obj.get("link");
+                        resultado = IndexadorDrive.Indexar(link);
+                        if (resultado == true){
+                            return Response.ok("Indexado Drive OK").build();
+                        }
+                        else{
+                            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                        }
+                    default:
+                        return Response.status(Response.Status.METHOD_NOT_ALLOWED).entity("Error en el método pasado").build();
+                }
+        }
+                catch (Exception ex) {
+             return Response.status(Response.Status.BAD_REQUEST).build();
          }
-         else{
-             Indexador.Indexar();
-         }
-         }
-         catch (Exception ex) {
-             return Response.status(Response.Status.NOT_FOUND).build();
-         }
-         
-        return Response.ok("Indexado OK").build();
     }
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postJson(String content) throws ClassNotFoundException, SQLException, Exception {
-        JSONObject obj;
-         obj = new JSONObject(content);
-         String link = (String) obj.get("link");
          try{
-             if (link != null){
-             IndexadorDrive.Indexar(link);
+                JSONObject obj;
+                obj = new JSONObject(content);
+                String metodo = (String) obj.get("metodo");
+                boolean resultado;
+                switch(metodo){
+                    case "local":
+                        resultado = Indexador.Indexar();
+                        if (resultado == true){
+                            return Response.ok("Indexado manual OK").build();
+                            }
+                        else{
+                            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                        }
+                    case "drive":
+                        String link = (String) obj.get("link");
+                        resultado = IndexadorDrive.Indexar(link);
+                        if (resultado == true){
+                            return Response.ok("Indexado Drive OK").build();
+                        }
+                        else{
+                            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                        }
+                    default:
+                        return Response.status(Response.Status.METHOD_NOT_ALLOWED).entity("Error en el método pasado").build();
+                }
+        }
+                catch (Exception ex) {
+             return Response.status(Response.Status.BAD_REQUEST).build();
          }
-         else{
-             Indexador.Indexar();
-         }
-         }
-         catch (Exception ex) {
-             return Response.status(Response.Status.NOT_FOUND).build();
-         }
-         
-        return Response.ok("Indexado OK").build();
-    }
+}
 }

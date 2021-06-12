@@ -23,6 +23,7 @@ import java.util.Map;
  * @author Gabriel
  */
 public class Buscador {
+
     private static Map<String, Float> pesosBusqueda;
     private static Map<String, Integer> frecuencias;    
     private static Map<String, Resultado> resultadosMap;

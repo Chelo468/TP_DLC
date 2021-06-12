@@ -26,7 +26,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Chelo
  */
-@Path("documento")
+@Path("/documento")
 @RequestScoped
 public class DocumentoResource {
     
