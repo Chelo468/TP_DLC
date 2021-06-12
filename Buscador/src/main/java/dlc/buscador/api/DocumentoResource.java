@@ -46,9 +46,16 @@ public class DocumentoResource {
             db.getStatement();
         
             Documento doc = DBDocumento.loadDB(db, documento);
-
+            String drive = doc.getDriveId();
+            if (drive != null){
+                String url = "drive.google.com/file/d/" + drive;
+                return Response.ok(url).build();
+            }
+            else{
+                
+            
             BufferedReader reader = new BufferedReader(new InputStreamReader(
-                                    new FileInputStream(doc.getUrl()), "windows-1252"));
+                                    new FileInputStream(doc.getPath()), "windows-1252"));
 
             String inputLine = null;
             StringBuilder contenidoDocumento = new StringBuilder();
@@ -59,6 +66,7 @@ public class DocumentoResource {
             }
 
             return Response.ok(contenidoDocumento.toString()).build();
+            }
         }
         catch(Exception ex)
         {
