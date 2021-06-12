@@ -25,8 +25,9 @@ import java.util.ArrayList;
  */
 public abstract class DBDocumento {
     private static final String TITULO = "titulo";
-    private static final String URL = "url";
+    private static final String PATH = "path";
     private static final String CANTIDAD_PALABRAS = "cantidadPalabras";
+    private static final String DRIVE_ID = "driveId"; 
  
 //    public static ResultSet consultarDocumento(AccesoBD db) throws SQLException{
 //        String sql = "SELECT * FROM DOCUMENTO;";
@@ -44,8 +45,9 @@ public abstract class DBDocumento {
         if (rs.next()) {
             documento = new Documento();
             documento.setTitulo(rs.getString(TITULO));
-            documento.setUrl(rs.getString(URL));
+            documento.setPath(rs.getString(PATH));
             documento.setCantidadPalabras(rs.getInt(CANTIDAD_PALABRAS));
+            documento.setDriveId(rs.getString(DRIVE_ID));
             
     }
             return documento;
@@ -72,8 +74,8 @@ public abstract class DBDocumento {
         rs.close();
         return documento;
     }
-    public static Documento loadDB(String link, AccesoBD db) throws Exception {
-        String query = "SELECT * FROM DOCUMENTO d WHERE d.url = '" + link + "'";
+    public static Documento loadDB(String path, AccesoBD db) throws Exception {
+        String query = "SELECT * FROM DOCUMENTO d WHERE d.url = '" + path + "'";
        // db.prepareStatement(query);
         ResultSet rs = db.executeQuery(query);
         Documento documento = buildDocumento(rs);
@@ -110,27 +112,30 @@ public abstract class DBDocumento {
         if (rs.next()) {
             documento = new Documento();
             documento.setTitulo(rs.getString(TITULO));
-            documento.setUrl(rs.getString(URL));
+            documento.setPath(rs.getString(PATH));
+            documento.setDriveId(rs.getString(DRIVE_ID));
         }
         return documento;
     }
     public static void agregarDocumento(AccesoBD db, Documento doc) throws ClassNotFoundException, SQLException, Exception{
-        String sql = "INSERT INTO DOCUMENTO VALUES(?,?,?)";
+        String sql = "INSERT INTO DOCUMENTO VALUES(?,?,?,?)";
                //      "VALUES('"+ path + "', '" + nombre + "'); ";
         db.prepareStatement(sql);
-        db.setString(1, doc.getUrl());
+        db.setString(1, doc.getPath());
         db.setString(2, doc.getTitulo());
         db.setInt(3, doc.getCantidadPalabras());
+        db.setString(4, doc.getDriveId());
         db.executeUpdate();
         }
     public static void prepararDocumento(AccesoBD db) throws SQLException{
-        String sql = "INSERT INTO DOCUMENTO VALUES(?,?,?)";
+        String sql = "INSERT INTO DOCUMENTO VALUES(?,?,?,?)";
         db.prepareStatement(sql);
     }
     public static void agregarDocumentoPreparado(AccesoBD db, Documento doc) throws SQLException, Exception{
-        db.setString(1, doc.getUrl());
+        db.setString(1, doc.getPath());
         db.setString(2, doc.getTitulo());
         db.setInt(3, doc.getCantidadPalabras());
+        db.setString(4, doc.getDriveId());
         db.executeUpdate();
     }
     

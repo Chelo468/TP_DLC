@@ -46,8 +46,9 @@ public class AccesoBD {
         Statement st = con.createStatement();
         String sql = "CREATE TABLE DOCUMENTO " +
                    " (titulo VARCHAR(100)not NULL UNIQUE, " + 
-                   " url VARCHAR(100), " + 
+                   " path VARCHAR(100), " + 
                    " cantidadPalabras INTEGER, " + 
+                   " driveId VARCHAR(100), " + 
                    " PRIMARY KEY ( titulo ));" + 
                     "CREATE TABLE VOCABULARIO " +
                    " (palabra VARCHAR(100) not NULL UNIQUE, " + 

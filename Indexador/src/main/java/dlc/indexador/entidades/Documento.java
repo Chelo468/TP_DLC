@@ -15,24 +15,35 @@ import java.sql.Timestamp;
  */
 public class Documento {
     private String titulo;
-    private String url;
+    private String path;
+    private String driveId;
 
     private int cantidadPalabras;
 
     public Documento() {
-        this.url = null;
+        this.path = null;
         this.titulo = null;
+        this.driveId = null;
         this.cantidadPalabras = 0;
     }
 
     public Documento(String nombreFichero, String pathArchivo, int cantidadPalabras) {
-       this.url = url;
+       this.path = path;
         this.titulo = titulo;
         this.cantidadPalabras = cantidadPalabras;
+        this.driveId = null;
     }
-
-    public String getUrl() {
-        return url;
+     public Documento(String nombreFichero, String pathArchivo, int cantidadPalabras, String driveId) {
+       this.path = path;
+        this.titulo = titulo;
+        this.cantidadPalabras = cantidadPalabras;
+        this.driveId = driveId;
+    }
+     public String getDriveId() {
+        return driveId;
+    }
+    public String getPath() {
+        return path;
     }
 
     public String getTitulo() {
@@ -41,8 +52,11 @@ public class Documento {
     public int getCantidadPalabras() {
         return cantidadPalabras;
     }
-    public void setUrl(String url) {
-        this.url = url;
+    public void setDriveId(String driveId) {
+        this.driveId = driveId;
+    }
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public void setTitulo(String titulo) {
@@ -52,8 +66,14 @@ public class Documento {
         this.cantidadPalabras = cantidad;
     }
     public Documento( String url, String titulo) {
-        this.url = url;
+        this.path = url;
         this.titulo = titulo;
+        this.cantidadPalabras = 0;
+    }
+    public Documento( String url, String titulo, String driveId) {
+        this.path = url;
+        this.titulo = titulo;
+        this.driveId = driveId;
         this.cantidadPalabras = 0;
     }
 

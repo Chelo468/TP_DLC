@@ -20,6 +20,7 @@ public interface DBVocabulario {
     static final String CANTIDAD_DOCUMENTOS = "cantidadDocumentos";
     static final String MAXIMA_FRECUENCIA = "maximaFrecuencia";
     
+    
     public static Vocabulario buildVocabulario(ResultSet rs) throws Exception {
         Vocabulario vocabulario = null;
         if (rs.next()) {

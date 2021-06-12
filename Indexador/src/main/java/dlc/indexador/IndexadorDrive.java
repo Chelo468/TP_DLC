@@ -42,6 +42,7 @@ public class IndexadorDrive {
     private static Map<String, Posteo> posteosIndexados;
     private static long CANTIDAD_POSTEOS_MEMORIA = 200000;
     private static int contadorActualizaciones = 0;
+    private static int contadorDocumentos = 0;
     
     
     public static AccesoBD generarAccesoBD() throws ClassNotFoundException, SQLException{
@@ -69,18 +70,13 @@ public class IndexadorDrive {
        obtenerVocabularios(db);       
        Drive driveService = GoogleDriveUtils.getDriveService();
        
-        if(palabrasIndexadas == null)
-        {
-            palabrasIndexadas = new HashMap<String, Vocabulario>();
-        }
-         if(posteosIndexados == null)
+        if(posteosIndexados == null)
         {
             posteosIndexados = new HashMap<String, Posteo>();
         }
          try{
         Map<String, Posteo> posteosAInsertar = new HashMap<>();
         
-        int contadorDocumentos = 0;
         long contPosteos = 0;
         
         if (Configuracion.DIRECTORIO_ORIGEN != null) {
@@ -99,16 +95,16 @@ public class IndexadorDrive {
                      contadorDocumentos++;
                 pathArchivo = Configuracion.DIRECTORIO_ORIGEN + nombreFichero;
                 descargarArchivo(pathArchivo, link,driveService);
-                doc = new Documento(nombreFichero, link);
+                doc = new Documento(nombreFichero, pathArchivo, link);
                 Map<String, Posteo> posteosDocumento = indexarNuevoDocumento(pathArchivo);
                     
                     if(posteosDocumento != null)
                     {
                         doc.setCantidadPalabras(posteosDocumento.size());
                                         
-                        if(contadorDocumentos == 1 || i == 0 || (i + 1) % 10 == 0)
+                        if(contadorDocumentos == 1 || (contadorDocumentos) % 10 == 0)
                         {
-                            System.out.println("Documentos procesados: " + (i + 1));    
+                            System.out.println("Documentos procesados: " + (contadorDocumentos));    
                         }
 
                         DBDocumento.agregarDocumento(db, doc);

@@ -31,9 +31,9 @@ public class Main {
             //Crea el objeto Statement en la conexion
             //db.getStatement();
 
-          //  AccesoBD.borrarDatos(db);
-           // AccesoBD.crearDatos(db);
-            IndexadorDrive.Indexar("asd");
+        //    AccesoBD.borrarDatos(db);
+        //    AccesoBD.crearDatos(db);
+            Indexador.Indexar();
       //      IndexadorDrive.Indexar("0B_R7SeoAotsmUUtYendIX04zRjA");
 
             Map<String, Vocabulario> palabrasIndexadas = Indexador.getPalabrasIndexadas();
