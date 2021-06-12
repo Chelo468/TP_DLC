@@ -6,6 +6,7 @@
 package dlc.buscador.busqueda;
 
 import dlc.buscador.entidades.Resultado;
+import dlc.buscador.resources.MyServletContextListener;
 import dlc.indexador.bd.AccesoBD;
 import dlc.indexador.bd.DBDocumento;
 import dlc.indexador.bd.DBPosteo;
@@ -13,9 +14,18 @@ import dlc.indexador.bd.DBVocabulario;
 import dlc.indexador.entidades.Documento;
 import dlc.indexador.entidades.Posteo;
 import dlc.indexador.entidades.Vocabulario;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,15 +33,16 @@ import java.util.Map;
  * @author Gabriel
  */
 public class Buscador {
-
+    
     private static Map<String, Float> pesosBusqueda;
     private static Map<String, Integer> frecuencias;    
     private static Map<String, Resultado> resultadosMap;
     
-    public static ArrayList<Resultado> buscar(String busqueda) throws ClassNotFoundException, SQLException, Exception {
+    public static ArrayList<Resultado> buscar(String busqueda) throws ClassNotFoundException, SQLException, Exception {       
         
         AccesoBD db = new AccesoBD();
         
+        HashSet<String> stopwords = MyServletContextListener.getStopwords();
         db.obtenerConexion();
         db.getStatement();
             
@@ -82,9 +93,11 @@ public class Buscador {
                  double frecuenciaInversa = Math.log(cantidadDeDocumentosEnBase/vocabulario.getCantidadDocumentos());
                  
                  int frecuencia = posteos.get(j).getCantidadRepeticiones();
-                 
-                 Float peso =  ((float)frecuencia / (float) Math.sqrt(doc.getCantidadPalabras())) * (float) frecuenciaInversa;
-                 
+                 Float peso = ((float)frecuencia / (float) Math.sqrt(doc.getCantidadPalabras())) * (float) frecuenciaInversa;
+                 if (stopwords.contains(word)){
+                     peso = peso * (float) 0.0001;
+                 }
+                             
                  resultado = resultadosMap.get(nombre);
                                   
                  resultado.setFrecuenciaPalabra(vocabulario.getPalabra(), frecuencia);
@@ -144,5 +157,6 @@ public class Buscador {
          
         return listaResultados;
     }
+
     
 }
