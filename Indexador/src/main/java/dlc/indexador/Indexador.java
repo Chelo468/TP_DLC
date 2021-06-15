@@ -39,6 +39,7 @@ public class Indexador {
     private static AccesoBD db;
     private static long CANTIDAD_POSTEOS_MEMORIA = 200000;
     private static int contadorActualizaciones = 0;
+    private static int cantidadPalabras = 0;
     
     public static AccesoBD generarAccesoBD() throws ClassNotFoundException, SQLException{
         AccesoBD db = new AccesoBD();
@@ -105,7 +106,8 @@ public class Indexador {
                     
                     if(posteosDocumento != null)
                     {
-                        doc.setCantidadPalabras(posteosDocumento.size());
+                        doc.setCantidadPalabras(cantidadPalabras);
+                        cantidadPalabras = 0;
                                         
                         if(contadorDocumentos == 1 || i == 0 || (i + 1) % 10 == 0)
                         {
@@ -204,7 +206,6 @@ public class Indexador {
 
         BufferedReader reader = File.leerArchivo(archivoProcesar.toString());
         String nombreDocumento = archivoProcesar.getFileName().toString();
-        int cantidadPalabras = 0;
         
         //Si el documento se leyo aumentamos el contador
         cantidadDocumentosIndexados++;
@@ -285,8 +286,9 @@ public class Indexador {
             
             statementPreparado = true;
         }
-        
-        DBVocabulario.agregarVocabularioPreparado(db, entry.getValue());
+        Vocabulario vocabulario = entry.getValue();
+        DBVocabulario.agregarVocabularioPreparado(db, vocabulario);
+        vocabulario.setActualizado();
         
           
     };//Fin foreach
@@ -346,12 +348,15 @@ public class Indexador {
                         statementPreparado = true;
                     }
                      
+                    if (entry.getValue().getActualizado() == false){
+                        
+                    
                     DBVocabulario.actualizarVocabulario(db, entry.getValue());
                     contadorActualizaciones++;
                     if (contadorActualizaciones % 25000 == 0){
                         System.out.println("Se han actualizado " + contadorActualizaciones + " vocabularios");
                     }
-
+}
               }
             };
     }
