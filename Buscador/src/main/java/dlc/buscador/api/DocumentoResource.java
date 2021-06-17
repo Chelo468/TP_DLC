@@ -46,6 +46,11 @@ public class DocumentoResource {
             db.getStatement();
         
             Documento doc = DBDocumento.loadDB(db, documento);
+            
+            if(doc == null)
+            {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
             String drive = doc.getDriveId();
             if (drive != null){
                 String url = "drive.google.com/file/d/" + drive;
@@ -72,7 +77,7 @@ public class DocumentoResource {
         {
             System.out.println(ex);
             
-            return Response.accepted(ex).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
         
     }

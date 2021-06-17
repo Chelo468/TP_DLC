@@ -19,7 +19,7 @@ import javax.servlet.*;
 
 public class MyServletContextListener implements ServletContextListener {
 private static HashSet<String> stopwords = new HashSet(); 
-private static final String DIRECTORIO_STOPWORDS = "C:\\Users\\Gabriel\\Desktop\\Facultad\\2021\\DLC\\Stopwords\\";
+private static final String DIRECTORIO_STOPWORDS = "C:\\StopWords\\";
  public void contextInitialized(ServletContextEvent e) {
    try{
        File dir = new File(DIRECTORIO_STOPWORDS);

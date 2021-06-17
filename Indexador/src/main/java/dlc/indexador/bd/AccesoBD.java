@@ -24,7 +24,7 @@ public class AccesoBD {
     public static final String SQLDRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String CONNECTIONURL = "jdbc:sqlserver://localhost;databaseName=DLCDB";
     public static final String USER = "sa";
-    public static final String PASSWORD = "admin";
+    public static final String PASSWORD = "123456";
     Connection cn = null;
     Statement stmt = null;
     PreparedStatement pstmt = null;
